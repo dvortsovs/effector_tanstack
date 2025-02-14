@@ -27,8 +27,15 @@ export const effectorQuery = <TQueryFnData = unknown, TError = DefaultError, TDa
   })
   observer.subscribe(event)
 
-  const $store = createStore<TData | {}>(observer.getOptimisticResult(defaultedOptions))
 
+  // TODO придумать как реализовать принцип DRY
+  // Сейчас существенный недостаток заключается в том, что данные из запроса
+  // Хранятся и в client и в effector store
+  // хотелось бы обойтись без копирования данных и получать их на прямую с использованием effector
+  // реализовать это точно возможно, так как есть кейсы подобные в farfetched и в jotai-tastack-query
+  // Надо просто разобраться
+  const $store = createStore<TData | {}>(observer.getOptimisticResult(defaultedOptions))
+  console.log('is copy', $store.getState() !== observer.getOptimisticResult(defaultedOptions))
   $store.on(event, (_, payload) => payload)
 
   return {data: $store, changeParams}
